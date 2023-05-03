@@ -6,6 +6,8 @@ import * as admin from 'firebase-admin';
 import { Bucket } from '@google-cloud/storage';
 import { FilesInterceptor, AnyFilesInterceptor } from '@nestjs/platform-express';
 import { FirebaseService } from "src/storage/firebase.service";
+import { Roles } from "src/role/roles.decorator";
+import { AccountPosition } from "src/account/account.entity";
 
 @Controller('image')
 export class ImageController {
@@ -60,6 +62,7 @@ export class ImageController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number, @Body() updateImage: updateImageDto, @Res() res: Response) {
         try {
             let result = await this.imageService.update(+id, updateImage);
@@ -74,7 +77,8 @@ export class ImageController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.imageService.delete(+id);
             if (result) {

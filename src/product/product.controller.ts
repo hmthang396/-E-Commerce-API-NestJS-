@@ -3,6 +3,8 @@ import { Response } from 'express';
 import { CreateProductDto, UpdateProductDto } from './product.dto';
 import { ProductService } from './product.service';
 import { ImageService } from 'src/image/image.service';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('product')
 export class ProductController {
@@ -38,6 +40,7 @@ export class ProductController {
     }
 
     @Post()
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"create")
     async create(@Body() CreateProduct: CreateProductDto, @Res() res: Response) {
         try {
             let result = await this.productService.save(CreateProduct);
@@ -49,6 +52,7 @@ export class ProductController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number, @Body() UpdateProduct: UpdateProductDto, @Res() res: Response) {
         try {
             let result = await this.productService.update(+id, UpdateProduct);
@@ -63,7 +67,8 @@ export class ProductController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.productService.delete(+id);
             if (result) {

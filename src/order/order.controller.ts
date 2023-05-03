@@ -4,6 +4,8 @@ import { Response } from 'express';
 import { CreateOrderDto, UpdateOrderDto } from './order.dto';
 import { UtilsService } from './order.utils';
 import { Customer } from 'src/customer/customer.entity';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('order')
 export class OrderController {
@@ -42,14 +44,6 @@ export class OrderController {
     async create(@Body() body: any, @Res() res: Response) {
         try {
             let order: CreateOrderDto = new CreateOrderDto();
-            // order.fullname = body.fullname;
-            // order.address = `${body.address}, ${body.county}, ${body.city}`;
-            // order.customer = new Customer();
-            // order.customer.id =  body.customerId;
-            // order.method = body.method;
-            // order.phonenumber = body.phonenumber;
-            // order.status = body.status;
-            // order.total = ;
             let codeOrder: string = '';
             do {
                 codeOrder = await this.utils.generatorCode(12);
@@ -82,7 +76,8 @@ export class OrderController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.orderService.delete(+id);
             if (result) {

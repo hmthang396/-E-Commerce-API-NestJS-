@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { CollectionService } from './collection.service';
 import { Response } from 'express';
 import { CreateCollectionDto, UpdateCollectionDto } from './collection.dto';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('collection')
 export class CollectionController {
@@ -34,6 +36,7 @@ export class CollectionController {
     }
 
     @Post()
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"create")
     async create(@Body() createCollection: CreateCollectionDto, @Res() res: Response) {
         try {
             let result = await this.collectionService.save(createCollection);
@@ -45,6 +48,7 @@ export class CollectionController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number, @Body() updateCollection: UpdateCollectionDto, @Res() res: Response) {
         try {
             let result = await this.collectionService.update(+id, updateCollection);
@@ -59,7 +63,8 @@ export class CollectionController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.collectionService.delete(+id);
             if (result) {

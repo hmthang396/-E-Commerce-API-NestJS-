@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { Response } from "express";
 import { CategoryService } from "./category.service";
 import { createCategoryDto, updateCategoryDto } from "./category.dto";
+import { Roles } from "src/role/roles.decorator";
+import { AccountPosition } from "src/account/account.entity";
 
 @Controller('category')
 export class CategoryController {
@@ -32,6 +34,7 @@ export class CategoryController {
     }
 
     @Post()
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"create")
     async create(@Body() createCategoryDto: createCategoryDto, @Res() res: Response) {
         try {
             let result = await this.categoryService.save(createCategoryDto);
@@ -42,6 +45,7 @@ export class CategoryController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number,@Body() updateCategoryDto: updateCategoryDto, @Res() res: Response) {
         try {
             let result = await this.categoryService.update(+id, updateCategoryDto);
@@ -56,7 +60,8 @@ export class CategoryController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.categoryService.delete(+id);
             if (result) {

@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { ColorService } from './color.service';
 import { Response } from 'express';
 import { createColorDto, updateColorDto } from './color.dto';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('color')
 export class ColorController {
@@ -33,7 +35,7 @@ export class ColorController {
     }
 
     @Post()
-    
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"create")
     async create(@Body() createColor: createColorDto, @Res() res: Response) {
         try {
             let result = await this.colorService.save(createColor);
@@ -44,6 +46,7 @@ export class ColorController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number, @Body() updateColor: updateColorDto, @Res() res: Response) {
         try {
             let result = await this.colorService.update(+id, updateColor);
@@ -58,7 +61,8 @@ export class ColorController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.colorService.delete(+id);
             if (result) {

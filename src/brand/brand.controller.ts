@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { BrandService } from './brand.service';
 import { Response } from 'express';
 import { createBrandDto, updateBrandDto } from './brand.dto';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('brand')
 export class BrandController {
@@ -32,6 +34,7 @@ export class BrandController {
     }
 
     @Post()
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"create")
     async create(@Body() createBrandDto: createBrandDto, @Res() res: Response) {
         try {
             let result = await this.brandService.save(createBrandDto);
@@ -42,6 +45,7 @@ export class BrandController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"update")
     async update(@Param("id") id: number,@Body() updateBrandDto: updateBrandDto, @Res() res: Response) {
         try {
             let result = await this.brandService.update(+id, updateBrandDto);
@@ -56,7 +60,8 @@ export class BrandController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.brandService.delete(+id);
             if (result) {

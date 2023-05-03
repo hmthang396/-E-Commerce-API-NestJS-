@@ -7,13 +7,13 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { AccountPosition } from './account.entity';
 import { Roles } from 'src/role/roles.decorator';
 
-@UseGuards(AuthGuard)
+
 @Controller('account')
 export class AccountController {
     constructor(private accountService: AccountService) { }
 
     @Get(':id')
-    @Roles([AccountPosition.Administrator],"")
+    @Roles([AccountPosition.Administrator],null)
     async find(@Param("id") id: any, @Res() res: Response) {
         try {
             let result = await this.accountService.findById(+id);
@@ -40,6 +40,7 @@ export class AccountController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator],"update")
     async update(@Param("id") id: any, @Body() updateAccountDto: UpdateAccountDto, @Res() res: Response) {
         try {
             let result = await this.accountService.update(+id, updateAccountDto);
@@ -54,6 +55,7 @@ export class AccountController {
     }
 
     @Delete(':id')
+    @Roles([AccountPosition.Administrator],"delete")
     async delete(@Param("id") id: any, @Res() res: Response) {
         try {
             let result = await this.accountService.delete(+id);

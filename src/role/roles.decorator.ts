@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, SetMetadata } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AccountPosition } from 'src/account/account.entity';
 
 export const ROLES_KEY = 'roles';
-export const Roles = (roles: AccountPosition[],action : string) => SetMetadata(ROLES_KEY, {roles,action});
+export const Roles = (roles: AccountPosition[], action: string) => SetMetadata(ROLES_KEY, { roles, action });
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -14,12 +14,13 @@ export class RolesGuard implements CanActivate {
             context.getHandler(),
             context.getClass(),
         ]);
-        console.log(requiredRoles);
-        
-        if (!requiredRoles?.roles && !requiredRoles.action) {
-            return true;
-        }
         const { user } = context.switchToHttp().getRequest();
-        return requiredRoles.some((role) => user.position?.includes(role));
+        let checkRole = (requiredRoles?.roles) ? requiredRoles?.roles.some((role) => user.position === role) : true;
+        let checkAction = (requiredRoles?.action) ? user[requiredRoles?.action] : true;
+        if(checkRole && checkAction){
+            return true;
+        }else{
+            throw new UnauthorizedException('Access Denied', new HttpException('Access Denied', HttpStatus.FORBIDDEN));
+        }
     }
 }

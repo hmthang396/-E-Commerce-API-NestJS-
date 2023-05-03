@@ -2,6 +2,8 @@ import { Response } from 'express';
 import { DiscountService } from './discount.service';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Res } from "@nestjs/common";
 import { createDiscountDto, updateDiscountDto } from './discount.dto';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 @Controller('discount')
 export class DiscountController {
     constructor(private discountService: DiscountService) { }
@@ -31,6 +33,7 @@ export class DiscountController {
     }
 
     @Post()
+    @Roles([AccountPosition.Administrator],"create")
     async create(@Body() createDiscount: createDiscountDto, @Res() res: Response) {
         try {
             let result = await this.discountService.save(createDiscount);
@@ -41,6 +44,7 @@ export class DiscountController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator],"update")
     async update(@Param("id") id: number,@Body() updateDiscount: updateDiscountDto, @Res() res: Response) {
         try {
             let result = await this.discountService.update(+id, updateDiscount);
@@ -55,7 +59,8 @@ export class DiscountController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.discountService.delete(+id);
             if (result) {

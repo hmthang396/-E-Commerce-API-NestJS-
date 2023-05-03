@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { CommentService } from './comment.service';
 import { Response } from 'express';
 import { createCommentDto, updateCommentDto } from './comment.dto';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('comment')
 export class CommentController {
@@ -60,7 +62,8 @@ export class CommentController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator,AccountPosition.Manager],"delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.commentService.delete(+id);
             if (result) {

@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { Response } from "express";
 import { SubCategoryService } from "./subcategory.service";
 import { CreateSubCategoryDto, UpdateSubCategoryDto } from "./subcategory.dto";
+import { Roles } from "src/role/roles.decorator";
+import { AccountPosition } from "src/account/account.entity";
 
 @Controller('subcategory')
 export class SubCategoryController {
@@ -35,6 +37,7 @@ export class SubCategoryController {
 
 
     @Post()
+    @Roles([AccountPosition.Administrator, AccountPosition.Manager], "create")
     async create(@Body() createSubCategory: CreateSubCategoryDto, @Res() res: Response) {
         try {
             let result = await this.subCategoryService.save(createSubCategory);
@@ -47,6 +50,7 @@ export class SubCategoryController {
     }
 
     @Put(':id')
+    @Roles([AccountPosition.Administrator, AccountPosition.Manager], "update")
     async update(@Param("id") id: number, @Body() updateSubCategoryDto: UpdateSubCategoryDto, @Res() res: Response) {
         try {
             let result = await this.subCategoryService.update(+id, updateSubCategoryDto);
@@ -61,7 +65,8 @@ export class SubCategoryController {
     }
 
     @Delete(':id')
-    async dalete(@Param("id") id: number, @Res() res: Response) {
+    @Roles([AccountPosition.Administrator], "delete")
+    async delete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.subCategoryService.delete(+id);
             if (result) {

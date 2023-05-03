@@ -3,6 +3,8 @@ import { CustomerService } from './customer.service';
 import { Response } from 'express';
 import { CreateCustomerDto, UpdateCustomerDto } from './customer.dto';
 import { plainToClass } from 'class-transformer';
+import { AccountPosition } from 'src/account/account.entity';
+import { Roles } from 'src/role/roles.decorator';
 
 @Controller('customer')
 export class CustomerController {
@@ -48,6 +50,7 @@ export class CustomerController {
     }
 
     @Delete(':id')
+    @Roles([AccountPosition.Administrator],"delete")
     async delete(@Param("id") id: any, @Res() res: Response) {
         try {
             let result = await this.customerService.delete(+id);

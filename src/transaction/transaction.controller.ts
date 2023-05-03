@@ -3,6 +3,8 @@ import { Response } from 'express';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto, UpdateTransactionDto } from './transaction.dto';
 import { UtilsService } from 'src/order/order.utils';
+import { Roles } from 'src/role/roles.decorator';
+import { AccountPosition } from 'src/account/account.entity';
 
 @Controller('transaction')
 export class TransactionController {
@@ -71,6 +73,7 @@ export class TransactionController {
     }
 
     @Delete(':id')
+    @Roles([AccountPosition.Administrator], "delete")
     async dalete(@Param("id") id: number, @Res() res: Response) {
         try {
             let result = await this.transactionService.delete(+id);
